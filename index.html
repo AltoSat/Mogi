@@ -10,14 +10,17 @@
       padding: 0;
       box-sizing: border-box;
     }
+    html, body {
+      height: 100%;
+    }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
       background: #1c1c1e;
       color: #e5e5ea;
       line-height: 1.6;
-      padding: 16px;
-      padding-top: max(16px, env(safe-area-inset-top));
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      padding: 6px;
+      padding-top: max(6px, env(safe-area-inset-top));
+      padding-bottom: max(6px, env(safe-area-inset-bottom));
       min-height: 100vh;
     }
     .container {
@@ -25,11 +28,14 @@
       margin: 0 auto;
       background: #2c2c2e;
       border-radius: 24px;
-      padding: 20px 16px;
+      padding: 16px 8px;
       box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     h1 {
-      font-size: 1.6rem;
+      font-size: 1.9rem;
       font-weight: 700;
       text-align: center;
       margin-bottom: 4px;
@@ -37,7 +43,7 @@
     }
     .subtitle {
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 1rem;
       color: #98989d;
       margin-bottom: 20px;
       font-weight: 500;
@@ -54,7 +60,7 @@
       flex: 1;
       text-align: center;
       padding: 10px 4px;
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       font-weight: 600;
       border-radius: 24px;
       border: none;
@@ -73,16 +79,16 @@
       display: flex;
       justify-content: space-around;
       margin-bottom: 16px;
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       color: #98989d;
       background: #3a3a3c;
-      padding: 10px 6px;
+      padding: 12px 6px;
       border-radius: 16px;
     }
     .stats span {
       font-weight: 700;
       color: #ffffff;
-      font-size: 0.9rem;
+      font-size: 1.05rem;
     }
     .question-list {
       list-style: none;
@@ -94,7 +100,7 @@
       padding-right: 4px;
     }
     .question-item {
-      padding: 12px 14px;
+      padding: 16px 16px;
       background: #3a3a3c;
       border-radius: 14px;
       border: 1px solid #48484a;
@@ -104,7 +110,7 @@
       justify-content: space-between;
       align-items: center;
       font-weight: 500;
-      font-size: 0.9rem;
+      font-size: 1.05rem;
       color: #e5e5ea;
     }
     .question-item:active {
@@ -112,7 +118,7 @@
       transform: scale(0.98);
     }
     .status-icon {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       margin-left: 6px;
     }
     .correct-mark { color: #34c759; }
@@ -122,21 +128,25 @@
     .quiz-card {
       background: #2c2c2e;
       border-radius: 24px;
-      padding: 16px;
+      padding: 8px 4px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     .quiz-header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 0.85rem;
+      margin-bottom: 12px;
+      font-size: 1rem;
       color: #98989d;
+      padding: 0 4px;
     }
     .question-text {
       font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 18px;
+      font-size: 1.25rem;
+      margin-bottom: 20px;
       background: #3a3a3c;
-      padding: 14px;
+      padding: 18px;
       border-radius: 14px;
       white-space: pre-wrap;
       word-break: break-word;
@@ -145,16 +155,17 @@
     .options {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex: 1;
     }
     .option-btn {
-      padding: 14px 16px;
+      padding: 18px 20px;
       background: #3a3a3c;
       border: 1.5px solid #48484a;
       border-radius: 14px;
       text-align: left;
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       cursor: pointer;
       transition: all 0.15s;
       word-break: break-word;
@@ -181,11 +192,12 @@
       color: #ffffff;
     }
     .feedback {
-      padding: 12px;
+      padding: 16px;
       border-radius: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-weight: 600;
       text-align: center;
+      font-size: 1.15rem;
     }
     .feedback.correct {
       background: #1a3a2a;
@@ -197,9 +209,9 @@
     }
     .explanation {
       background: #3a3a3c;
-      padding: 14px;
+      padding: 18px;
       border-radius: 14px;
-      font-size: 0.8rem;
+      font-size: 1rem;
       color: #e5e5ea;
       margin-top: 8px;
       border-left: 4px solid #4da6ff;
@@ -209,16 +221,17 @@
     .nav-buttons {
       display: flex;
       gap: 10px;
-      margin-top: 16px;
+      margin-top: auto;
+      padding-top: 14px;
     }
     .back-btn, .next-btn {
       background: #0a84ff;
       color: white;
       border: none;
-      padding: 14px 18px;
+      padding: 16px 20px;
       border-radius: 30px;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       flex: 1;
       cursor: pointer;
       transition: 0.2s;
@@ -239,16 +252,17 @@
       background: none;
       border: 1px solid #ff453a;
       color: #ff453a;
-      padding: 10px 24px;
+      padding: 12px 28px;
       border-radius: 24px;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       cursor: pointer;
     }
     .empty-message {
       text-align: center;
       color: #98989d;
       padding: 30px 0;
-    }}
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>

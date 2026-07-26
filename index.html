@@ -263,6 +263,28 @@
       padding: 30px 0;
       font-size: 1rem;
     }
+    .speak-btn {
+      background: #3a3a3c;
+      border: 1.5px solid #48484a;
+      color: #e5e5ea;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      transition: 0.2s;
+    }
+    .speak-btn:active {
+      background: #48484a;
+    }
+    .speak-btn.speaking {
+      background: #4da6ff;
+      border-color: #4da6ff;
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -500,6 +522,7 @@
             <span>${status === 'unanswered' ? '未回答' : (status === 'correct' ? '正解済' : '不正解済')}</span>
           </div>
           <div class="question-text">${q.text}</div>
+          <button class="speak-btn" id="speakBtn">🔊 読み上げる</button>
           <div class="options" id="optionsContainer">${optionsHtml}</div>
           ${feedbackHtml}
           ${explanationHtml}
@@ -596,17 +619,27 @@
             const headerStatus = document.querySelector('.quiz-header span:last-child');
             if (headerStatus) headerStatus.textContent = isCorrect ? '正解済' : '不正解済';
 
-            // 次の問題ボタンを動的に表示
+// 次の問題ボタンを動的に表示（フィルターの変動に対応）
             const navDiv = document.querySelector('.nav-buttons');
             if (navDiv && !document.getElementById('nextQuestionBtn')) {
-              const list = getFilteredQuestions(currentPart, currentFilter);
-              const currentIdx = findCurrentIndexInPart();
-              if (currentIdx < list.length - 1) {
+              // 回答前のフィルター済みリストでのインデックスを保存
+              const listBefore = getFilteredQuestions(currentPart, currentFilter);
+              const currentIdx = listBefore.findIndex(q => q.id === currentQuestionId);
+              // 回答後（results更新後）のフィルター済みリストを取得
+              const listAfter = getFilteredQuestions(currentPart, currentFilter);
+              // 解いた問題がリストから消えている場合、同じインデックスが次の問題を指す
+              if (currentIdx < listAfter.length) {
+                const nextId = listAfter[currentIdx].id;
                 const nextBtn = document.createElement('button');
                 nextBtn.className = 'next-btn';
                 nextBtn.id = 'nextQuestionBtn';
                 nextBtn.textContent = '▶ 次の問題へ';
-                nextBtn.addEventListener('click', goToNextQuestion);
+                nextBtn.dataset.nextId = nextId;
+                nextBtn.addEventListener('click', function(e) {
+                  currentQuestionId = e.target.dataset.nextId;
+                  renderCurrentView();
+                  window.scrollTo(0, 0);
+                });
                 navDiv.appendChild(nextBtn);
               }
             }
@@ -620,6 +653,72 @@
         renderCurrentView();
       });
       document.getElementById('nextQuestionBtn')?.addEventListener('click', goToNextQuestion);
+      
+// ----- 読み上げ機能（Siri女性音声・速め）-----
+    const speakBtn = document.getElementById('speakBtn');
+    if (speakBtn && window.speechSynthesis) {
+      let isSpeaking = false;
+      speakBtn.addEventListener('click', () => {
+        if (isSpeaking) {
+          window.speechSynthesis.cancel();
+          speakBtn.classList.remove('speaking');
+          speakBtn.textContent = '🔊 読み上げる';
+          isSpeaking = false;
+          return;
+        }
+
+        const q = questions.find(q => q.id === currentQuestionId);
+        if (!q) return;
+
+        const texts = [q.text.replace(/\n/g, '。')];
+        q.options.forEach((opt, i) => {
+          texts.push(`選択肢${i + 1}。${opt.replace(/^\d+\.\s*/, '')}`);
+        });
+
+        // Siri女性音声を優先して選択
+        const voices = window.speechSynthesis.getVoices();
+        let jaVoice = voices.find(v => v.lang === 'ja-JP' && v.name.includes('Siri'));
+        if (!jaVoice) {
+          // Siriがなければ Kyoko などの女性音声を探す
+          jaVoice = voices.find(v => v.lang === 'ja-JP' && (v.name.includes('Kyoko') || v.name.includes('Otoya')));
+        }
+        if (!jaVoice) {
+          // 最終的に日本語音声なら何でも使う
+          jaVoice = voices.find(v => v.lang === 'ja-JP') || voices.find(v => v.lang.startsWith('ja'));
+        }
+
+        let idx = 0;
+        const speakNext = () => {
+          if (idx >= texts.length) {
+            speakBtn.classList.remove('speaking');
+            speakBtn.textContent = '🔊 読み上げる';
+            isSpeaking = false;
+            return;
+          }
+          const utter = new SpeechSynthesisUtterance(texts[idx]);
+          utter.lang = 'ja-JP';
+          utter.rate = 1.1;  // 速め
+          if (jaVoice) utter.voice = jaVoice;
+          utter.onend = () => {
+            idx++;
+            speakNext();
+          };
+          window.speechSynthesis.speak(utter);
+        };
+
+        isSpeaking = true;
+        speakBtn.classList.add('speaking');
+        speakBtn.textContent = '⏹ 停止';
+        speakNext();
+      });
+
+      if (window.speechSynthesis.getVoices().length === 0) {
+        window.speechSynthesis.onvoiceschanged = () => {};
+      }
+    } else if (speakBtn && !window.speechSynthesis) {
+      speakBtn.disabled = true;
+      speakBtn.textContent = '🔇 非対応';
+    }
     }
 
     // 初期化
